@@ -1,6 +1,6 @@
 Category,Phase 1,Phase 2
-Agent Manipulation,10.0,100.0
-Data Exfiltration,0.0,0.0
+Agent Manipulation,10.0,90.0
+Data Exfiltration,0.0,100.0
 Direct Overrides,100.0,100.0
 Obfuscation,70.0,100.0
 Role-Play,80.0,100.0

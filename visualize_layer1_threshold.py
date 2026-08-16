@@ -1,10 +1,3 @@
-"""Visualizes why LAYER1_THRESHOLD = 0.32 was a reasonable choice: plots
-every item's actual Layer 1 similarity score, split by category, with the
-threshold line drawn in. Shows both why it separates cleanly from Benign
-AND why it still misses Data Exfiltration / Agent Manipulation (motivating
-Layer 2) — the same evidence, visualized instead of just tabulated.
-"""
-
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt

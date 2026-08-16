@@ -1,22 +1,3 @@
-"""Diagnostic: would a logistic regression classifier (trained on Layer 1
-embeddings) do better than NLI at catching Data Exfiltration and Agent
-Manipulation attacks?
-
-Compares two evaluation methods on the SAME model to make a point
-concrete: with 70 examples and 384-dim embeddings, a linear classifier
-can trivially memorize the training set. The real question is whether it
-generalizes, which resubstitution (train==test) cannot tell you.
-
-1. RESUBSTITUTION: fit on all 70, evaluate on all 70 (what "fit and
-   check the same data" looks like — this is what we did for both
-   layers' thresholds so far).
-2. LEAVE-ONE-OUT CROSS-VALIDATION: for each of the 70 items, fit on the
-   other 69 and predict the held-out one. This is the honest estimate of
-   how it'd perform on an attack it hasn't seen before.
-
-Not part of the paper's pipeline — throwaway investigation code.
-"""
-
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer

@@ -1,21 +1,3 @@
-"""Diagnostic: why is Layer 2 (NLI contradiction detection) so ineffective?
-
-Investigates four things on the 44 items that actually reach Layer 2
-(the ones Layer 1 doesn't catch):
-
-1. Leave-one-out: the current design compares a benign item against ALL
-   20 baselines, including itself. Does excluding self-pairs matter?
-2. Aggregation strategy: max(contradiction) vs mean(contradiction) vs
-   net signal (max contradiction - max entailment) vs comparing only
-   against the single nearest baseline (by Layer 1 embedding similarity).
-3. Pair order: NLI is directional (premise -> hypothesis is not the same
-   as hypothesis -> premise). Does swapping the order change results?
-4. For each strategy: does it actually separate benign from attack scores
-   better than the current max-contradiction-over-all-20 approach?
-
-Not part of the paper's pipeline — this is throwaway investigation code.
-"""
-
 import numpy as np
 import pandas as pd
 from sentence_transformers import CrossEncoder, SentenceTransformer
@@ -64,8 +46,6 @@ print(f"Items reaching Layer 2: {n_items} ({is_benign.sum()} benign, {(~is_benig
 
 
 def evaluate_scores(name, scores):
-    """Given a deviation score per item, report separation quality and
-    the confusion matrix at the empirical-midpoint threshold."""
     benign_scores = scores[is_benign]
     attack_scores = scores[~is_benign]
     highest_benign = benign_scores.max()

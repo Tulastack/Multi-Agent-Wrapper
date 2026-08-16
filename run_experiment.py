@@ -1,11 +1,3 @@
-"""Runs the two-layer wrapper experiment: Phase 1 (Layer 1 only) vs
-Phase 2 (Layer 1 + Layer 2, parallel), on 50 attacks + 20 benign banking
-requests. Produces metrics tables (CSV) and charts (PNG) in output/.
-
-All detection logic lives in wrapper.py — this file is just data +
-benchmarking + reporting around it.
-"""
-
 import os
 import time
 

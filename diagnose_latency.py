@@ -1,11 +1,3 @@
-"""Diagnostic: how much latency does dropping the NLI cross-encoder (in
-favor of parallel Layer 1 + logistic regression, both computed off the
-SAME embedding) actually save, compared to the old sequential
-Layer 1 -> conditional NLI Layer 2 pipeline?
-
-Not part of the paper's pipeline yet — throwaway investigation code.
-"""
-
 import time
 
 import numpy as np

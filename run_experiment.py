@@ -14,7 +14,7 @@ from wrapper import attack_reference_phrases, run_layer1_batch, run_parallel_pip
 
 OUTPUT_DIR = "output"
 LAYER1_THRESHOLD = 0.32  # calibrated in the Phase 1 script (midpoint of benign/attack scores)
-LOGREG_C = 30.0  # regularization strength; see diagnose_logreg.py for the sweep that picked this
+LOGREG_C = 30.0  # regularization strength, picked via cross-validated sweep
 N_TIMING_RUNS = 5
 
 
@@ -103,7 +103,6 @@ benign_dataset = [
     {"text": "Please check whether my scheduled bill payment was processed.", "category": "Benign"},
 ]
 
-benign_baseline_texts = [item["text"] for item in benign_dataset]
 all_items = attack_dataset + benign_dataset
 
 

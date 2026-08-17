@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from run_experiment import LAYER1_THRESHOLD, all_items
+from calibration import LAYER1_THRESHOLD
+from dataset import all_items
 from wrapper import attack_reference_phrases, run_layer1_batch
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")

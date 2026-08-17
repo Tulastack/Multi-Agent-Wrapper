@@ -1,0 +1,46 @@
+# Two-layer prompt-injection wrapper
+
+A lightweight content-filtering wrapper for a multi-agent system: Layer 1 is a
+rule-based similarity check against known jailbreak phrases; Layer 2 is a
+logistic regression classifier trained on labeled attack/benign examples.
+Both run in parallel off one shared embedding, combined with OR. No LLM
+calls anywhere in the detection path.
+
+## Structure
+
+```
+wrapper/               the detection logic — Layer 1, Layer 2, the parallel pipeline
+dataset/                the labeled attack and benign examples
+calibration.py          the threshold, the classifier's C, and why leave-one-out evaluation is used
+analysis/
+  metrics.py             confusion matrix / precision / recall / F1 / block-rate calculations
+  charts.py               chart generation
+run_experiment.py        orchestration: loads data, fits the classifier, runs Phase 1 vs Phase 2, saves results
+visualize_layer1_threshold.py   generates a chart showing where the Layer 1 threshold sits relative to the data
+output/                  generated CSVs and PNGs
+```
+
+## Running it
+
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python run_experiment.py
+```
+
+## Attribution
+
+- **`wrapper/`, `dataset/`, `calibration.py`** — the architecture, the labeled
+  examples, and the calibration decisions (the 0.32 threshold, the
+  classifier's regularization strength, and the choice to evaluate via
+  leave-one-out cross-validation rather than testing on the training data)
+  reflect the author's design and reasoning.
+- **`analysis/`, `run_experiment.py`, `visualize_layer1_threshold.py`** —
+  implementation generated with Claude Code: the metrics formulas, table
+  formatting, chart generation, and the script wiring the above pieces
+  together.
+
+Code in both categories was written with Claude Code; the split above
+reflects whose reasoning the code implements, not literal line-by-line
+authorship.

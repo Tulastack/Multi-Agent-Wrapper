@@ -23,16 +23,3 @@ def save_block_rate_chart(block_rate_df, path):
     fig.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
-
-
-def save_fpr_chart(overall_metrics_df, path):
-    fig, ax = plt.subplots(figsize=(5, 5.5))
-    fpr_values = overall_metrics_df["False Positive Rate (%)"].tolist()
-    bars = ax.bar(overall_metrics_df["Phase"], fpr_values, color=["#4C72B0", "#DD8452"])
-    ax.set_ylabel("False Positive Rate (%)")
-    ax.set_title("False Positive Rate: Phase 1 vs Phase 2")
-    ax.set_ylim(0, max(10, max(fpr_values) * 1.5 if max(fpr_values) > 0 else 10))
-    ax.bar_label(bars, fmt="%.1f%%", padding=2)
-    fig.tight_layout()
-    fig.savefig(path, dpi=150)
-    plt.close(fig)

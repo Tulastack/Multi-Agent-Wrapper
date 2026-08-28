@@ -11,7 +11,7 @@ from wrapper import attack_reference_phrases, run_layer1_batch, run_parallel_pip
 from dataset import all_items
 from calibration import LAYER1_THRESHOLD, LOGREG_C
 from analysis.metrics import label_outcome, compute_confusion_counts, compute_prf1, block_rate_by_category
-from analysis.charts import save_block_rate_chart, save_fpr_chart
+from analysis.charts import save_block_rate_chart
 
 OUTPUT_DIR = "output"
 N_TIMING_RUNS = 5
@@ -182,10 +182,6 @@ def main():
     block_rate_png = f"{OUTPUT_DIR}/block_rate_by_category.png"
     save_block_rate_chart(block_rate_df, block_rate_png)
     print(f"Saved: {block_rate_png}")
-
-    fpr_png = f"{OUTPUT_DIR}/false_positive_rate.png"
-    save_fpr_chart(overall_metrics_df, fpr_png)
-    print(f"Saved: {fpr_png}")
 
     print("\nDone.")
 

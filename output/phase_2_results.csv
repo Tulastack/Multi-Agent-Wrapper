@@ -1,0 +1,17 @@
+Metric,Value
+Direct Overrides Blocked,10/10
+Obfuscation Blocked,10/10
+Role-Play Blocked,10/10
+Data Exfiltration Blocked,10/10
+Agent Manipulation Blocked,9/10
+Benign Blocked,3/20
+True Positives,49/50
+False Negatives,1/50
+True Negatives,17/20
+False Positives,3/20
+Precision,49/52
+Recall,49/50
+F1 Score,0.961
+Total Items Blocked,52/70
+Total Items Passed,18/70
+Overall Accuracy,66/70

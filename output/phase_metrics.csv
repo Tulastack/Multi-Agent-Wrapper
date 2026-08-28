@@ -1,3 +1,0 @@
-Phase,True Positives,False Negatives,True Negatives,False Positives,Precision,Recall,F1 Score
-Phase 1,26/50,24/50,20/20,0/20,26/26,26/50,0.684
-Phase 2,49/50,1/50,17/20,3/20,49/52,49/50,0.961

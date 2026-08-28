@@ -1,8 +1,0 @@
-Metric,Value,What it means
-Attacks Blocked (Recall),49/50 (98.0%),"Of the 50 real attacks tested, this many were correctly blocked."
-Attacks Bypassed,1/50 (2.0%),"Of the 50 real attacks tested, this many slipped through undetected."
-Benign Requests Passed,17/20 (85.0%),"Of the 20 legitimate requests tested, this many were correctly allowed through."
-Benign Requests Blocked (False Positive Rate),3/20 (15.0%),"Of the 20 legitimate requests tested, this many were wrongly blocked."
-Precision,49/52 (94.2%),"Of everything the system blocked for any reason, this fraction was an actual attack (not a false alarm)."
-F1 Score,0.961 (96.1%),"Balances precision and recall into a single score, so a system can't look good by only optimizing one."
-Overall Accuracy,66/70 (94.3%),Total correct decisions (attacks blocked + benign passed) out of all 70 items tested.

@@ -12,10 +12,9 @@ from dataset import all_items
 from calibration import LAYER1_THRESHOLD, LOGREG_C
 from analysis.metrics import (
     label_outcome,
-    compute_confusion_counts,
-    compute_prf1,
     block_rate_by_category,
-    build_phase_summary,
+    build_category_table,
+    build_metrics_table,
 )
 from analysis.charts import save_block_rate_chart
 
@@ -137,23 +136,20 @@ def main():
     print("STEP 4: Metrics")
     print("=" * 70)
 
-    phase_summaries = {}
-    block_rate_tables = {}
-    for phase_name, df in [("Phase 1", phase1_df), ("Phase 2", phase2_df)]:
-        tp, fn, tn, fp = compute_confusion_counts(df)
-        precision, recall, f1 = compute_prf1(tp, fn, fp)
-        phase_summaries[phase_name] = build_phase_summary(tp, fn, tn, fp, precision, recall, f1)
-        block_rate_tables[phase_name] = block_rate_by_category(df)
+    phase_dfs = {"Phase 1": phase1_df, "Phase 2": phase2_df}
 
-    block_rate_df = pd.DataFrame(block_rate_tables)
+    # Percentage version, used only to feed the chart (numeric, not text).
+    block_rate_df = pd.DataFrame({name: block_rate_by_category(df) for name, df in phase_dfs.items()})
     block_rate_df.index.name = "Category"
 
-    print("\n--- Block Rate by Category (%) ---")
-    print(block_rate_df.to_string())
+    category_table = build_category_table(phase_dfs)
+    metrics_table = build_metrics_table(phase_dfs)
 
-    for phase_name, summary_df in phase_summaries.items():
-        print(f"\n--- {phase_name} Summary ---")
-        print(summary_df.to_string(index=False))
+    print("\n--- Attacks Blocked by Category ---")
+    print(category_table.to_string(index=False))
+
+    print("\n--- Confusion Matrix + Precision/Recall/F1 ---")
+    print(metrics_table.to_string(index=False))
 
     # -----------------------------------------------------------------
     # STEP 5 — Save CSVs
@@ -162,15 +158,12 @@ def main():
     print("STEP 5: Saving tables (CSV) and charts (PNG)")
     print("=" * 70)
 
-    block_rate_csv = f"{OUTPUT_DIR}/block_rate_by_category.csv"
-    block_rate_df.to_csv(block_rate_csv)
-    print(f"Saved: {block_rate_csv}")
-
-    for phase_name, summary_df in phase_summaries.items():
-        filename = phase_name.lower().replace(" ", "_")
-        summary_csv = f"{OUTPUT_DIR}/{filename}_summary.csv"
-        summary_df.to_csv(summary_csv, index=False)
-        print(f"Saved: {summary_csv}")
+    category_csv = f"{OUTPUT_DIR}/category_breakdown.csv"
+    metrics_csv = f"{OUTPUT_DIR}/phase_metrics.csv"
+    category_table.to_csv(category_csv, index=False)
+    metrics_table.to_csv(metrics_csv, index=False)
+    print(f"Saved: {category_csv}")
+    print(f"Saved: {metrics_csv}")
 
     # -----------------------------------------------------------------
     # STEP 6 — Charts

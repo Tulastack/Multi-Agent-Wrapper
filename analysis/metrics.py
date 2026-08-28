@@ -28,53 +28,50 @@ def block_rate_by_category(results_df):
     return table.rename("Block Rate (%)")
 
 
-def build_phase_summary(tp, fn, tn, fp, precision, recall, f1):
-    """One self-contained table for a single phase: every count shown as
-    a fraction of its actual denominator (never a bare number), plus a
-    plain-language explanation of what each row means."""
-    n_attacks = tp + fn
-    n_benign = tn + fp
-    n_blocked = tp + fp
-    n_total = n_attacks + n_benign
-    accuracy = (tp + tn) / n_total if n_total > 0 else 0.0
-    benign_pass_rate = tn / n_benign if n_benign > 0 else 0.0
-    fpr = fp / n_benign if n_benign > 0 else 0.0
+def build_category_table(phase_dfs):
+    """One row per attack category plus Benign plus a Total row, one
+    column per phase, every cell shown as 'blocked/total'."""
+    category_order = ["Direct Overrides", "Obfuscation", "Role-Play", "Data Exfiltration", "Agent Manipulation"]
+    rows = []
+    for cat in category_order:
+        row = {"Category": cat}
+        for phase_name, df in phase_dfs.items():
+            sub = df[df["category"] == cat]
+            row[phase_name] = f"{sub['blocked'].sum()}/{len(sub)}"
+        rows.append(row)
 
-    rows = [
-        {
-            "Metric": "Attacks Blocked (Recall)",
-            "Value": f"{tp}/{n_attacks} ({recall * 100:.1f}%)",
-            "What it means": f"Of the {n_attacks} real attacks tested, this many were correctly blocked.",
-        },
-        {
-            "Metric": "Attacks Bypassed",
-            "Value": f"{fn}/{n_attacks} ({(1 - recall) * 100:.1f}%)",
-            "What it means": f"Of the {n_attacks} real attacks tested, this many slipped through undetected.",
-        },
-        {
-            "Metric": "Benign Requests Passed",
-            "Value": f"{tn}/{n_benign} ({benign_pass_rate * 100:.1f}%)",
-            "What it means": f"Of the {n_benign} legitimate requests tested, this many were correctly allowed through.",
-        },
-        {
-            "Metric": "Benign Requests Blocked (False Positive Rate)",
-            "Value": f"{fp}/{n_benign} ({fpr * 100:.1f}%)",
-            "What it means": f"Of the {n_benign} legitimate requests tested, this many were wrongly blocked.",
-        },
-        {
-            "Metric": "Precision",
-            "Value": f"{tp}/{n_blocked} ({precision * 100:.1f}%)" if n_blocked > 0 else "n/a",
-            "What it means": "Of everything the system blocked for any reason, this fraction was an actual attack (not a false alarm).",
-        },
-        {
-            "Metric": "F1 Score",
-            "Value": f"{f1:.3f} ({f1 * 100:.1f}%)",
-            "What it means": "Balances precision and recall into a single score, so a system can't look good by only optimizing one.",
-        },
-        {
-            "Metric": "Overall Accuracy",
-            "Value": f"{tp + tn}/{n_total} ({accuracy * 100:.1f}%)",
-            "What it means": f"Total correct decisions (attacks blocked + benign passed) out of all {n_total} items tested.",
-        },
-    ]
+    benign_row = {"Category": "Benign"}
+    total_row = {"Category": "Total Attacks Blocked"}
+    for phase_name, df in phase_dfs.items():
+        benign_sub = df[df["category"] == "Benign"]
+        benign_row[phase_name] = f"{benign_sub['blocked'].sum()}/{len(benign_sub)}"
+
+        attack_sub = df[df["category"] != "Benign"]
+        total_row[phase_name] = f"{attack_sub['blocked'].sum()}/{len(attack_sub)}"
+
+    rows.append(benign_row)
+    rows.append(total_row)
+    return pd.DataFrame(rows)
+
+
+def build_metrics_table(phase_dfs):
+    """One row per phase, one column per statistic, every applicable
+    cell shown as 'count/total' rather than a bare number."""
+    rows = []
+    for phase_name, df in phase_dfs.items():
+        tp, fn, tn, fp = compute_confusion_counts(df)
+        precision, recall, f1 = compute_prf1(tp, fn, fp)
+        n_attacks = tp + fn
+        n_benign = tn + fp
+        n_blocked = tp + fp
+        rows.append({
+            "Phase": phase_name,
+            "True Positives": f"{tp}/{n_attacks}",
+            "False Negatives": f"{fn}/{n_attacks}",
+            "True Negatives": f"{tn}/{n_benign}",
+            "False Positives": f"{fp}/{n_benign}",
+            "Precision": f"{tp}/{n_blocked}" if n_blocked > 0 else "n/a",
+            "Recall": f"{tp}/{n_attacks}",
+            "F1 Score": f"{f1:.3f}",
+        })
     return pd.DataFrame(rows)

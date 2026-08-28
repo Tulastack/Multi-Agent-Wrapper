@@ -10,7 +10,13 @@ from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from wrapper import attack_reference_phrases, run_layer1_batch, run_parallel_pipeline
 from dataset import all_items
 from calibration import LAYER1_THRESHOLD, LOGREG_C
-from analysis.metrics import label_outcome, compute_confusion_counts, compute_prf1, block_rate_by_category
+from analysis.metrics import (
+    label_outcome,
+    compute_confusion_counts,
+    compute_prf1,
+    block_rate_by_category,
+    build_phase_summary,
+)
 from analysis.charts import save_block_rate_chart
 
 OUTPUT_DIR = "output"
@@ -131,27 +137,13 @@ def main():
     print("STEP 4: Metrics")
     print("=" * 70)
 
-    phase_metrics_rows = []
+    phase_summaries = {}
     block_rate_tables = {}
     for phase_name, df in [("Phase 1", phase1_df), ("Phase 2", phase2_df)]:
         tp, fn, tn, fp = compute_confusion_counts(df)
         precision, recall, f1 = compute_prf1(tp, fn, fp)
-        fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
-
-        phase_metrics_rows.append({
-            "Phase": phase_name,
-            "True Positives (Attacks Blocked)": tp,
-            "False Negatives (Attacks Bypassed)": fn,
-            "True Negatives (Benign Passed)": tn,
-            "False Positives (Benign Blocked)": fp,
-            "Precision": round(precision, 3),
-            "Recall": round(recall, 3),
-            "F1 Score": round(f1, 3),
-            "False Positive Rate (%)": round(fpr * 100, 1),
-        })
+        phase_summaries[phase_name] = build_phase_summary(tp, fn, tn, fp, precision, recall, f1)
         block_rate_tables[phase_name] = block_rate_by_category(df)
-
-    overall_metrics_df = pd.DataFrame(phase_metrics_rows)
 
     block_rate_df = pd.DataFrame(block_rate_tables)
     block_rate_df.index.name = "Category"
@@ -159,8 +151,9 @@ def main():
     print("\n--- Block Rate by Category (%) ---")
     print(block_rate_df.to_string())
 
-    print("\n--- Confusion Matrix + Precision/Recall/F1 by Phase ---")
-    print(overall_metrics_df.to_string(index=False))
+    for phase_name, summary_df in phase_summaries.items():
+        print(f"\n--- {phase_name} Summary ---")
+        print(summary_df.to_string(index=False))
 
     # -----------------------------------------------------------------
     # STEP 5 — Save CSVs
@@ -170,11 +163,14 @@ def main():
     print("=" * 70)
 
     block_rate_csv = f"{OUTPUT_DIR}/block_rate_by_category.csv"
-    metrics_csv = f"{OUTPUT_DIR}/phase_metrics.csv"
     block_rate_df.to_csv(block_rate_csv)
-    overall_metrics_df.to_csv(metrics_csv, index=False)
     print(f"Saved: {block_rate_csv}")
-    print(f"Saved: {metrics_csv}")
+
+    for phase_name, summary_df in phase_summaries.items():
+        filename = phase_name.lower().replace(" ", "_")
+        summary_csv = f"{OUTPUT_DIR}/{filename}_summary.csv"
+        summary_df.to_csv(summary_csv, index=False)
+        print(f"Saved: {summary_csv}")
 
     # -----------------------------------------------------------------
     # STEP 6 — Charts

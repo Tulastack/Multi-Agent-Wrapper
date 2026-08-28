@@ -1,3 +1,0 @@
-Phase,True Positives (Attacks Blocked),False Negatives (Attacks Bypassed),True Negatives (Benign Passed),False Positives (Benign Blocked),Precision,Recall,F1 Score,False Positive Rate (%)
-Phase 1,26,24,20,0,1.0,0.52,0.684,0.0
-Phase 2,49,1,17,3,0.942,0.98,0.961,15.0

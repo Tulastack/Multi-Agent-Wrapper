@@ -1,0 +1,8 @@
+Category,Blocked
+Direct Overrides,10/10 (100.0%)
+Obfuscation,7/10 (70.0%)
+Role-Play,8/10 (80.0%)
+Data Exfiltration,0/10 (0.0%)
+Agent Manipulation,1/10 (10.0%)
+Benign,0/20 (0.0%)
+Total Attacks Blocked,26/50 (52.0%)

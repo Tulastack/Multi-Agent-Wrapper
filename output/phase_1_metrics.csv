@@ -1,0 +1,2 @@
+True Positives,False Negatives,True Negatives,False Positives,Precision,Recall,F1 Score
+26/50 (52.0%),24/50 (48.0%),20/20 (100.0%),0/20 (0.0%),26/26 (100.0%),26/50 (52.0%),0.684 (68.4%)

@@ -10,7 +10,7 @@ from sklearn.model_selection import LeaveOneOut, cross_val_predict
 from wrapper import attack_reference_phrases, run_layer1_batch, run_parallel_pipeline
 from dataset import all_items
 from calibration import LAYER1_THRESHOLD, LOGREG_C
-from analysis.metrics import label_outcome, block_rate_by_category, build_phase_table
+from analysis.metrics import label_outcome, block_rate_by_category, build_category_table, build_metrics_table
 from analysis.charts import save_block_rate_chart
 
 OUTPUT_DIR = "output"
@@ -137,10 +137,14 @@ def main():
     block_rate_df = pd.DataFrame({name: block_rate_by_category(df) for name, df in phase_dfs.items()})
     block_rate_df.index.name = "Category"
 
-    phase_tables = {name: build_phase_table(df) for name, df in phase_dfs.items()}
-    for phase_name, table in phase_tables.items():
-        print(f"\n--- {phase_name} ---")
-        print(table.to_string(index=False))
+    category_tables = {name: build_category_table(df) for name, df in phase_dfs.items()}
+    metrics_tables = {name: build_metrics_table(df) for name, df in phase_dfs.items()}
+
+    for phase_name in phase_dfs:
+        print(f"\n--- {phase_name}: Attacks Blocked by Category ---")
+        print(category_tables[phase_name].to_string(index=False))
+        print(f"\n--- {phase_name}: Confusion Matrix + Precision/Recall/F1 ---")
+        print(metrics_tables[phase_name].to_string(index=False))
 
     # -----------------------------------------------------------------
     # STEP 5 — Save CSVs
@@ -149,11 +153,14 @@ def main():
     print("STEP 5: Saving tables (CSV) and charts (PNG)")
     print("=" * 70)
 
-    for phase_name, table in phase_tables.items():
+    for phase_name in phase_dfs:
         filename = phase_name.lower().replace(" ", "_")
-        table_csv = f"{OUTPUT_DIR}/{filename}_results.csv"
-        table.to_csv(table_csv, index=False)
-        print(f"Saved: {table_csv}")
+        category_csv = f"{OUTPUT_DIR}/{filename}_category.csv"
+        metrics_csv = f"{OUTPUT_DIR}/{filename}_metrics.csv"
+        category_tables[phase_name].to_csv(category_csv, index=False)
+        metrics_tables[phase_name].to_csv(metrics_csv, index=False)
+        print(f"Saved: {category_csv}")
+        print(f"Saved: {metrics_csv}")
 
     # -----------------------------------------------------------------
     # STEP 6 — Charts

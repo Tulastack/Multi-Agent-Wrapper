@@ -74,7 +74,7 @@ def main():
 
     loo_probabilities = cross_val_predict(
         LogisticRegression(max_iter=2000, C=LOGREG_C), embeddings, labels,
-        cv=10, method="predict_proba",
+        cv=5, method="predict_proba",
     )[:, 1]
     layer2_blocked = loo_probabilities > 0.5
 
